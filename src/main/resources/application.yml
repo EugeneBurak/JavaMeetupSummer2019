@@ -1,0 +1,135 @@
+spring:
+  application:
+    name: trycatch
+  data:
+    rest:
+      base-path: trycatch/api
+
+server:
+  port: 8080
+
+account:
+  host: ${ACCOUNT_HOST}
+
+aws:
+  sns:
+    card-created-or-updated:
+      arn: test-card-created-or-updated
+
+  sqs:
+    confirm-points:
+      name: ${SQS_CONFIRM_POINT:confirm-points}
+
+    upload-points:
+      name: ${SQS_UPLOAD_POINT:upload-points}
+
+cloud:
+  aws:
+    stack:
+      auto: false
+
+ftp:
+  server:
+    host: ${FTP_HOST:0.0.0.0}
+    port: ${FTP_PORT:21}
+    user: ${FTP_USER:qwer}
+    password: ${FTP_PASSWORD:qwer}
+    remoteDir: ${FTP_REMOTE_DIR:/qwer-default/}
+
+---
+spring:
+  profiles: local
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
+external:
+  host: 127.0.0.1
+  port: 8080
+
+account:
+  host: 127.0.0.1
+
+amazon:
+  aws:
+    region: local
+    accesskey: key
+    secretkey: key2
+
+cloud:
+  aws:
+    region:
+      auto: false
+      static: eu-west-1
+
+aws:
+  sqs:
+    port: 9324
+    host: sqs
+
+---
+spring:
+  profiles: dev
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
+external:
+  host: 127.0.0.1
+  port: 8080
+
+account:
+  host: 127.0.0.1
+
+amazon:
+  dynamodb:
+    endpoint: http://dynamodb
+    port: 8000
+    table:
+      prefix: dev_
+  aws:
+    region: local
+    accesskey: key
+    secretkey: key2
+
+cloud:
+  aws:
+    region:
+      auto: false
+      static: eu-west-1
+
+aws:
+  sns:
+    endpoint: http://sns:9911
+
+---
+spring:
+  profiles: tst01
+
+amazon:
+  dynamodb:
+    table:
+      prefix: tst01_
+
+---
+spring:
+  profiles: tst02
+
+amazon:
+  dynamodb:
+    table:
+      prefix: tst02_
+
+---
+spring:
+  profiles: prd
+
+amazon:
+  dynamodb:
+    table:
+      prefix: prd_
+
+ftp:
+  server:
+    host: ${FTP_HOST:0.0.0.0}
+    user: ${FTP_USER}
+    password: ${FTP_PASSWORD}
+    remoteDir: /trycatch/

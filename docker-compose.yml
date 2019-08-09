@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+
+  dynamodb:
+    image: amazon/dynamodb-local:latest
+    entrypoint: java
+    command: "-jar DynamoDBLocal.jar -sharedDb -inMemory"
+    ports:
+      - 8000:8000
+
+  sns:
+    image: s12v/sns:latest
+    container_name: sns
+    ports:
+      - 9911:9911
+    volumes:
+      - ./db.json:/etc/sns/db.json
+
+  sqs:
+    image: roribio16/alpine-sqs:latest
+    container_name: alpine-sqs
+    ports:
+      - 9324:9324
+      - 9325:9325
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./elasticmq.conf:/opt/elasticmq.conf
+
+  trycatch_jar:
+    image: openjdk:8-jdk-alpine
+    container_name: trycatch_jar
+    depends_on:
+      - sns
+      - sqs
+      - dynamodb
+    ports:
+      - 8080:8080
+    volumes:
+      - ./target/trycatch-0.0.1-SNAPSHOT.jar:/trycatch-0.0.1-SNAPSHOT.jar
+    command: ["java","-jar","-Dspring.profiles.active=dev,local","trycatch-0.0.1-SNAPSHOT.jar"]
